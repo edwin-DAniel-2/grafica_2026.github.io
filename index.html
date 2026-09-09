@@ -1,0 +1,1813 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PLANETA 3D - Un viaje interactivo</title>
+
+
+<style>
+
+/* =========================
+   CONFIGURACIÓN GENERAL
+========================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background-image: url("fondo.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+h2{
+    color: #00d8ff;
+}
+
+
+/* =========================
+   FONDO
+========================= */
+
+body::before{
+    content:"";
+
+    position:fixed;
+    inset:0;
+
+    z-index:-3;
+
+    background-image:
+        linear-gradient(
+            rgba(0,5,18,.48),
+            rgba(0,5,18,.68)
+        ),
+        url("fondo.jpg");
+
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed;
+}
+
+body::after{
+    content:"";
+
+    position:fixed;
+    inset:0;
+
+    z-index:-2;
+
+    pointer-events:none;
+
+    background:
+        radial-gradient(
+            circle at 75% 35%,
+            rgba(0,183,255,.13),
+            transparent 25%
+        ),
+        radial-gradient(
+            circle at 20% 20%,
+            rgba(0,110,255,.08),
+            transparent 25%
+        );
+}
+
+
+/* =========================
+   BARRA DE NAVEGACIÓN
+========================= */
+
+.navbar{
+    height:78px;
+    width:100%;
+
+    display:flex;
+    align-items:center;
+
+    padding:0 3%;
+
+    gap:25px;
+
+    background:rgba(2,8,20,.86);
+
+    border-bottom:1px solid rgba(0,213,255,.65);
+
+    box-shadow:
+        0 4px 25px rgba(0,195,255,.12);
+
+    position:relative;
+
+    z-index:10;
+}
+
+
+/* LOGO */
+
+.logo{
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    min-width:270px;
+}
+
+.logo-icon{
+    width:55px;
+    height:55px;
+
+    border:4px solid #00d9ff;
+
+    border-radius:50%;
+
+    transform:rotate(-25deg);
+
+    position:relative;
+
+    box-shadow:
+        0 0 18px #00cfff;
+}
+
+.logo-icon::after{
+    content:"";
+
+    position:absolute;
+
+    width:70px;
+    height:22px;
+
+    border:3px solid #00d9ff;
+
+    border-radius:50%;
+
+    top:12px;
+    left:-12px;
+}
+
+.logo-text{
+    font-size:29px;
+
+    font-weight:800;
+
+    letter-spacing:1px;
+}
+
+.logo-text span{
+    color:#00d8ff;
+}
+
+.logo-sub{
+    border-left:1px solid #31546a;
+
+    padding-left:22px;
+
+    color:#00d9ff;
+
+    font-size:11px;
+
+    line-height:1.4;
+
+    letter-spacing:1.3px;
+
+    width:125px;
+}
+
+
+/* MENÚ */
+
+.menu{
+    display:flex;
+
+    align-items:center;
+
+    justify-content:flex-end;
+
+    gap:28px;
+
+    flex:1;
+}
+
+.menu a{
+    color:#f4f8ff;
+
+    text-decoration:none;
+
+    font-size:14px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    height:78px;
+
+    position:relative;
+
+    white-space:nowrap;
+}
+
+.menu a:hover,
+.menu a.active{
+    color:#00dcff;
+}
+
+.menu a.active::after{
+    content:"";
+
+    position:absolute;
+
+    height:5px;
+
+    left:0;
+    right:0;
+
+    bottom:0;
+
+    background:#00d9ff;
+
+    box-shadow:
+        0 0 12px #00d9ff;
+}
+
+.menu-icon{
+    font-size:21px;
+}
+
+
+/* ACCIONES */
+
+.actions{
+    display:flex;
+
+    gap:20px;
+
+    font-size:23px;
+
+    margin-left:10px;
+}
+
+
+/* =========================
+   SECCIÓN PRINCIPAL
+========================= */
+
+.hero{
+    min-height:480px;
+
+    display:grid;
+
+    grid-template-columns:42% 58%;
+
+    align-items:center;
+
+    padding:45px 6% 20px;
+
+    position:relative;
+}
+
+.hero-content{
+    z-index:2;
+
+    padding-top:10px;
+}
+
+.kicker{
+    color:#fff;
+
+    font-size:17px;
+
+    letter-spacing:7px;
+
+    margin-bottom:8px;
+}
+
+.hero h1{
+    font-size:64px;
+
+    line-height:.93;
+
+    margin-bottom:20px;
+
+    text-transform:uppercase;
+}
+
+.hero h1 span{
+    color:#08d8ff;
+
+    text-shadow:
+        0 0 25px rgba(0,216,255,.35);
+}
+
+.hero p{
+    font-size:18px;
+
+    line-height:1.42;
+
+    max-width:530px;
+
+    color:#eef4ff;
+
+    margin-bottom:28px;
+}
+
+
+/* =========================
+   BOTÓN PRINCIPAL
+========================= */
+
+.start-btn{
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    border:2px solid #00d9ff;
+
+    border-radius:38px;
+
+    padding:17px 30px;
+
+    color:white;
+
+    background:rgba(0,151,255,.2);
+
+    box-shadow:
+        0 0 20px rgba(0,214,255,.55),
+        inset 0 0 18px rgba(0,214,255,.1);
+
+    font-size:20px;
+
+    font-weight:bold;
+
+    letter-spacing:1px;
+
+    cursor:pointer;
+
+    transition:.25s;
+}
+
+.start-btn:hover{
+    transform:translateY(-3px);
+
+    background:rgba(0,198,255,.35);
+}
+
+.play{
+    font-size:22px;
+
+    color:#72edff;
+}
+
+
+/* =========================
+   DESCRIPCIÓN PRINCIPAL
+========================= */
+
+#descripcionPrincipal{
+
+    max-height:0;
+
+    overflow:hidden;
+
+    opacity:0;
+
+    transition:
+        max-height .5s ease,
+        opacity .4s ease,
+        margin .4s ease;
+
+    color:#e8f4ff;
+
+    font-size:17px;
+
+    line-height:1.65;
+
+    max-width:560px;
+
+    text-align:left;
+
+    margin-top:0;
+}
+
+
+/* =========================
+   PLANETA 3D
+========================= */
+
+.hero-planet{
+
+    height:500px;
+
+    position:relative;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+}
+
+#planet{
+
+    width:100%;
+
+    height:100%;
+
+    display:block;
+}
+
+
+/* ETIQUETA DEL PLANETA */
+
+.planet-label{
+
+    position:absolute;
+
+    right:-10px;
+
+    bottom:65px;
+
+    width:220px;
+
+    padding:16px 20px;
+
+    border:1px solid #00d9ff;
+
+    border-radius:
+        20px 0 20px 20px;
+
+    background:
+        rgba(1,12,28,.72);
+
+    box-shadow:
+        0 0 18px rgba(0,217,255,.25);
+}
+
+.planet-label strong{
+
+    color:#00d9ff;
+
+    display:block;
+
+    margin-bottom:7px;
+}
+
+.planet-label span{
+
+    color:#d9e8f7;
+
+    font-size:14px;
+
+    line-height:1.35;
+}
+
+
+/* =========================
+   TARJETAS
+========================= */
+
+.cards{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:18px;
+
+    padding:
+        0 5% 35px;
+
+    position:relative;
+
+    z-index:3;
+}
+
+.card{
+
+    min-height:350px;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+    position:relative;
+
+    background:#071122;
+
+    border:
+        1px solid var(--card-color);
+
+    box-shadow:
+        0 0 16px rgba(0,0,0,.45);
+
+    transition:.3s;
+}
+
+.card:hover{
+
+    transform:
+        translateY(-8px);
+
+    box-shadow:
+        0 0 22px var(--card-color);
+}
+
+
+/* IMAGEN */
+
+.card-img{
+
+    height:180px;
+
+    overflow:hidden;
+
+    position:relative;
+}
+
+.card-img::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+        linear-gradient(
+            transparent 35%,
+            #071122 100%
+        );
+}
+
+.card-img img{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+    display:block;
+}
+
+
+/* CUERPO */
+
+.card-body{
+
+    padding:
+        0 20px 18px;
+
+    margin-top:-5px;
+
+    position:relative;
+
+    z-index:2;
+}
+
+.card h2{
+
+    font-size:21px;
+
+    line-height:1.05;
+
+    margin-bottom:12px;
+}
+
+.card p{
+
+    font-size:14px;
+
+    line-height:1.4;
+
+    color:#eef4fb;
+
+    min-height:58px;
+}
+
+
+/* =========================
+   BOTÓN EXPLORAR
+========================= */
+
+.explore{
+
+    margin-top:15px;
+
+    height:38px;
+
+    width:100%;
+
+    border:
+        1px solid var(--card-color);
+
+    border-radius:22px;
+
+    background:transparent;
+
+    color:var(--card-color);
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.25s;
+}
+
+.explore:hover{
+
+    background:
+        var(--card-color);
+
+    color:#00101a;
+}
+
+
+/* =========================
+   COLORES DE LAS TARJETAS
+========================= */
+
+.card1{
+    --card-color:#ff9d00;
+}
+
+.card2{
+    --card-color:#00eaff;
+}
+
+.card3{
+    --card-color:#b35cff;
+}
+
+.card4{
+    --card-color:#ffc400;
+}
+
+.card5{
+    --card-color:#159cff;
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+.footer{
+
+    height:60px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 5%;
+
+    border-top:
+        1px solid rgba(0,199,255,.18);
+
+    color:#8bdcf0;
+
+    font-size:12px;
+
+    letter-spacing:1.5px;
+
+    background:
+        rgba(0,7,18,.55);
+}
+
+.footer span:last-child{
+
+    color:#d8e7f1;
+
+    letter-spacing:0;
+
+    font-size:14px;
+}
+
+
+/* =========================
+   TABLET
+========================= */
+
+@media(max-width:1100px){
+
+    .navbar{
+        gap:10px;
+    }
+
+    .logo{
+        min-width:230px;
+    }
+
+    .menu{
+        gap:14px;
+    }
+
+    .menu a{
+        font-size:11px;
+    }
+
+    .cards{
+        grid-template-columns:
+            repeat(3,1fr);
+    }
+
+    .hero{
+        grid-template-columns:
+            45% 55%;
+    }
+
+    .hero h1{
+        font-size:52px;
+    }
+
+}
+
+
+/* =========================
+   CELULAR
+========================= */
+
+@media(max-width:760px){
+
+    .navbar{
+
+        height:auto;
+
+        min-height:70px;
+
+        flex-wrap:wrap;
+
+        padding:12px 5%;
+    }
+
+    .logo{
+        min-width:auto;
+    }
+
+    .logo-sub,
+    .actions{
+        display:none;
+    }
+
+    .menu{
+
+        order:3;
+
+        width:100%;
+
+        overflow-x:auto;
+
+        justify-content:flex-start;
+    }
+
+    .menu a{
+        height:42px;
+    }
+
+    .menu a.active::after{
+        bottom:-1px;
+    }
+
+    .hero{
+
+        grid-template-columns:1fr;
+
+        padding-top:30px;
+    }
+
+    .hero h1{
+        font-size:48px;
+    }
+
+    .hero-planet{
+        height:390px;
+    }
+
+    .planet-label{
+
+        right:5px;
+
+        bottom:20px;
+    }
+
+    .cards{
+
+        grid-template-columns:
+            1fr 1fr;
+
+        padding:
+            0 4% 25px;
+    }
+
+}
+
+
+/* =========================
+   CELULAR PEQUEÑO
+========================= */
+
+@media(max-width:480px){
+
+    .cards{
+        grid-template-columns:1fr;
+    }
+
+    .hero h1{
+        font-size:42px;
+    }
+
+    .kicker{
+
+        font-size:12px;
+
+        letter-spacing:4px;
+    }
+
+    .hero p{
+        font-size:15px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     MENÚ
+========================= -->
+
+<header class="navbar">
+
+
+    <div class="logo">
+
+        <div class="logo-icon"></div>
+
+        <div class="logo-text">
+
+            PLANETA <span>3D</span>
+
+        </div>
+
+        <div class="logo-sub">
+
+            UN VIAJE INTERACTIVO<br>
+            POR NUESTRO MUNDO
+
+        </div>
+
+    </div>
+
+
+
+    <nav class="menu">
+
+
+        <a href="index.html" class="active">
+
+            <span class="menu-icon">
+                ⌂
+            </span>
+
+            INICIO
+
+        </a>
+         <a href="#formacion">
+
+            <span class="menu-icon">
+                ▢
+            </span>
+
+            FORMACION
+
+        </a>
+
+
+        <a href="#vida">
+
+            <span class="menu-icon">
+                ▢
+            </span>
+
+            VIDA
+
+        </a>
+
+
+        <a href="#evolucion">
+            <span class="menu-icon">
+                ♧
+            </span>
+
+            EVOLUCION
+
+        </a>
+
+
+        <a href="#civilizaciones">
+
+            <span class="menu-icon">
+                ♙
+            </span>
+
+            CIVILIZACIONES
+
+        </a>
+
+
+        <a href="#construcciones">
+
+            <span class="menu-icon">
+                △
+            </span>
+
+            CONSTRUCCIONES
+
+        </a>
+
+
+        <a href="#acerca">
+
+            <span class="menu-icon">
+                ⓘ
+            </span>
+
+            ACERCA DE
+
+        </a>
+
+
+    </nav>
+
+
+
+    <div class="actions">
+
+        <span>⚙</span>
+
+        <span>◖</span>
+
+    </div>
+
+
+</header>
+
+
+
+<!-- =========================
+     CONTENIDO
+========================= -->
+
+<main>
+
+
+<section class="hero" id="inicio">
+
+
+    <!-- TEXTO -->
+
+    <div class="hero-content">
+
+
+        <div class="kicker">
+
+            EXPLORA LA HISTORIA DE
+
+        </div>
+
+
+        <h1>
+
+            NUESTRO<br>
+
+            <span>PLANETA</span>
+
+        </h1>
+
+
+        <p>
+
+            Un viaje interactivo en 3D para descubrir cómo se formó
+            la Tierra, cómo surgió la vida, su evolución y las grandes
+            civilizaciones que construyeron nuestro mundo.
+
+        </p>
+
+
+        <!-- BOTÓN PRINCIPAL -->
+
+        <button
+            class="start-btn"
+            onclick="mostrarDescripcionPrincipal()"
+        >
+
+            <span class="play">
+                ⓘ
+            </span>
+
+            VER DESCRIPCIÓN
+
+            <span>
+                →
+            </span>
+
+        </button>
+
+
+        <!-- ÚNICA DESCRIPCIÓN -->
+
+        <div id="descripcionPrincipal">
+
+            La Tierra se formó hace aproximadamente 4.540 millones
+            de años a partir de una gran cantidad de polvo, rocas y
+            otros materiales que se encontraban alrededor del joven
+            Sol. Poco a poco, estos materiales comenzaron a unirse
+            debido a la gravedad, formando cuerpos cada vez más
+            grandes.
+
+            <br><br>
+
+            Con el paso del tiempo, las colisiones entre estos cuerpos
+            provocaron un aumento de la temperatura. La Tierra pasó
+            por una etapa muy caliente hasta que comenzó a enfriarse
+            lentamente. De esta manera se formaron las primeras capas
+            del planeta, la corteza y posteriormente los océanos y
+            la atmósfera.
+
+            <br><br>
+
+            A partir de este proceso comenzó una larga historia de
+            cambios geológicos y biológicos que permitieron que nuestro
+            planeta se convirtiera en el mundo diverso que conocemos
+            actualmente.
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- PLANETA 3D -->
+
+    <div class="hero-planet">
+
+
+        <canvas id="planet"></canvas>
+
+
+        <div class="planet-label">
+
+            <strong>
+
+                ◉ NUESTRO PLANETA
+
+            </strong>
+
+            <span>
+
+                Un lugar único<br>
+                en el universo.
+
+            </span>
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =========================
+     TARJETAS
+========================= -->
+
+<section class="cards">
+
+
+    <!-- 1. FORMACIÓN -->
+
+    <article
+        class="card card1"
+        id="formacion"
+    >
+
+        <div class="card-img">
+
+            <img src="formacion.jpg" alt="Formación de la Tierra">
+        </div>
+
+
+        <div class="card-body">
+
+            <h2>
+
+                FORMACIÓN<br>
+                DE LA TIERRA
+
+            </h2>
+
+
+            <p>
+
+                Descubre cómo el polvo y las rocas se unieron
+                para formar nuestro planeta.
+
+            </p>
+
+
+            <button
+                class="explore"
+                onclick="window.location.href='formacion.html'"
+            >
+
+                EXPLORAR →
+
+            </button>
+
+        </div>
+
+    </article>
+
+
+
+    <!-- 2. VIDA -->
+
+    <article
+        class="card card2"
+        id="vida"
+    >
+
+        <div class="card-img">
+
+            <img
+                src="vida.png"
+                alt="Historia de la vida"
+            >
+
+        </div>
+
+
+        <div class="card-body">
+
+            <h2>
+
+                HISTORIA<br>
+                DE LA VIDA
+
+            </h2>
+
+
+            <p>
+
+                Desde los primeros seres hasta la increíble
+                biodiversidad actual.
+
+            </p>
+
+
+            <button
+                class="explore"
+                onclick="window.location.href='vida.html'"
+            >
+
+                EXPLORAR →
+
+            </button>
+
+        </div>
+
+    </article>
+
+
+
+    <!-- 3. EVOLUCIÓN -->
+
+    <article
+        class="card card3"
+        id="evolucion"
+    >
+
+        <div class="card-img">
+
+            <img
+                src="evolucion.avif"
+                alt="Evolución"
+            >
+
+        </div>
+
+
+        <div class="card-body">
+
+            <h2>
+
+                EVOLUCIÓN
+
+            </h2>
+
+
+            <p>
+
+                Conoce cómo los seres vivos y los humanos
+                han cambiado a lo largo del tiempo.
+
+            </p>
+
+
+            <button
+                class="explore"
+                onclick="window.location.href='evolucion.html'"
+            >
+
+                EXPLORAR →
+
+            </button>
+
+        </div>
+
+    </article>
+
+
+
+    <!-- 4. CIVILIZACIONES -->
+
+    <article
+        class="card card4"
+        id="civilizaciones"
+    >
+
+        <div class="card-img">
+
+            <img
+                src="civilisaciones.avif"
+                alt="Civilizaciones"
+            >
+
+        </div>
+
+
+        <div class="card-body">
+
+            <h2>
+
+                CIVILIZACIONES
+
+            </h2>
+
+
+            <p>
+
+                Explora las grandes culturas que construyeron
+                nuestra historia.
+
+            </p>
+
+
+            <button
+                class="explore"
+                onclick="window.location.href='civilizaciones.html'"
+            >
+
+                EXPLORAR →
+
+            </button>
+
+        </div>
+
+    </article>
+
+
+
+    <!-- 5. CONSTRUCCIONES -->
+
+    <article
+        class="card card5"
+        id="construcciones"
+    >
+
+        <div class="card-img">
+
+            <img
+                src="maravilla.jpg"
+                alt="Grandes construcciones"
+            >
+
+        </div>
+
+
+        <div class="card-body">
+
+            <h2>
+
+                GRANDES<br>
+                CONSTRUCCIONES
+
+            </h2>
+
+
+            <p>
+
+                Maravillas arquitectónicas que marcaron
+                la historia de la humanidad.
+
+            </p>
+
+
+            <button
+                class="explore"
+                onclick="window.location.href='construcciones.html'"
+            >
+
+                EXPLORAR →
+
+            </button>
+
+        </div>
+
+    </article>
+
+
+</section>
+
+
+</main>
+
+
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer
+    class="footer"
+    id="acerca"
+>
+
+
+    <span>
+
+        〰 APRENDER　•　EXPLORAR　•　DESCUBRIR
+
+    </span>
+
+
+    <span>
+
+        ◉　Un proyecto de programación gráfica
+
+    </span>
+
+
+</footer>
+
+
+
+<!-- =========================
+     THREE.JS
+========================= -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+
+
+<script>
+
+
+/* =========================
+   DESCRIPCIÓN PRINCIPAL
+========================= */
+
+function mostrarDescripcionPrincipal(){
+
+    const descripcion =
+        document.getElementById(
+            "descripcionPrincipal"
+        );
+
+    const boton =
+        document.querySelector(
+            ".start-btn"
+        );
+
+
+    if(
+        descripcion.style.maxHeight &&
+        descripcion.style.maxHeight !== "0px"
+    ){
+
+        descripcion.style.maxHeight =
+            "0px";
+
+        descripcion.style.opacity =
+            "0";
+
+        descripcion.style.marginTop =
+            "0";
+
+
+        boton.innerHTML =
+            '<span class="play">ⓘ</span> VER DESCRIPCIÓN <span>→</span>';
+
+    }
+
+    else{
+
+        descripcion.style.maxHeight =
+            descripcion.scrollHeight + "px";
+
+        descripcion.style.opacity =
+            "1";
+
+        descripcion.style.marginTop =
+            "18px";
+
+
+        boton.innerHTML =
+            '<span class="play">×</span> OCULTAR DESCRIPCIÓN';
+
+    }
+
+}
+
+
+
+/* =========================
+   PLANETA 3D
+========================= */
+
+const canvas =
+    document.getElementById(
+        "planet"
+    );
+
+
+const escena =
+    new THREE.Scene();
+
+
+const camara =
+    new THREE.PerspectiveCamera(
+
+        45,
+
+        canvas.clientWidth /
+        canvas.clientHeight,
+
+        0.1,
+
+        100
+
+    );
+
+
+const renderizador =
+    new THREE.WebGLRenderer({
+
+        canvas:canvas,
+
+        alpha:true,
+
+        antialias:true
+
+    });
+
+
+
+/* AJUSTAR */
+
+function ajustar(){
+
+    const ancho =
+        canvas.clientWidth;
+
+    const alto =
+        canvas.clientHeight;
+
+
+    renderizador.setSize(
+        ancho,
+        alto,
+        false
+    );
+
+
+    renderizador.setPixelRatio(
+
+        Math.min(
+            window.devicePixelRatio,
+            2
+        )
+
+    );
+
+
+    camara.aspect =
+        ancho / alto;
+
+
+    camara.updateProjectionMatrix();
+
+}
+
+
+ajustar();
+
+
+
+/* CÁMARA */
+
+camara.position.z =
+    3.1;
+
+
+
+/* LUZ AMBIENTE */
+
+const luzAmbiente =
+    new THREE.AmbientLight(
+
+        0xffffff,
+
+        0.7
+
+    );
+
+escena.add(
+    luzAmbiente
+);
+
+
+
+/* LUZ DIRECCIONAL */
+
+const luz =
+    new THREE.DirectionalLight(
+
+        0xffffff,
+
+        1.2
+
+    );
+
+luz.position.set(
+
+    4,
+    2,
+    5
+
+);
+
+escena.add(luz);
+
+
+
+/* =========================
+   TIERRA
+========================= */
+
+const geometria =
+    new THREE.SphereGeometry(
+
+        1.15,
+
+        64,
+
+        64
+
+    );
+
+
+const textura =
+    new THREE.TextureLoader().load(
+
+        "tierra.jpg",
+
+        function(){
+
+            textura.anisotropy =
+                renderizador
+                .capabilities
+                .getMaxAnisotropy();
+
+        }
+
+    );
+
+
+const material =
+    new THREE.MeshStandardMaterial({
+
+        map:textura,
+
+        roughness:.72,
+
+        metalness:.02
+
+    });
+
+
+const planeta =
+    new THREE.Mesh(
+
+        geometria,
+
+        material
+
+    );
+
+escena.add(
+    planeta
+);
+
+
+
+/* =========================
+   ATMÓSFERA
+========================= */
+
+const atmosfera =
+    new THREE.Mesh(
+
+        new THREE.SphereGeometry(
+
+            1.19,
+
+            64,
+
+            64
+
+        ),
+
+        new THREE.MeshBasicMaterial({
+
+            color:0x00bfff,
+
+            transparent:true,
+
+            opacity:.08,
+
+            side:THREE.BackSide
+
+        })
+
+    );
+
+
+escena.add(
+    atmosfera
+);
+
+
+
+/* =========================
+   VELOCIDAD
+========================= */
+
+let velocidad =
+    0.003;
+
+
+
+/* =========================
+   ANIMACIÓN
+========================= */
+
+function animar(){
+
+    requestAnimationFrame(
+        animar
+    );
+
+
+    planeta.rotation.y +=
+        velocidad;
+
+
+    atmosfera.rotation.y +=
+        velocidad * .65;
+
+
+    renderizador.render(
+
+        escena,
+
+        camara
+
+    );
+
+}
+
+
+animar();
+
+
+
+/* =========================
+   CAMBIO DE TAMAÑO
+========================= */
+
+window.addEventListener(
+
+    "resize",
+
+    ajustar
+
+);
+
+
+
+/* =========================
+   MOVIMIENTO DEL MOUSE
+========================= */
+
+canvas.addEventListener(
+
+    "mousemove",
+
+    (e)=>{
+
+        const rect =
+            canvas.getBoundingClientRect();
+
+
+        const x =
+            (e.clientX - rect.left) /
+            rect.width;
+
+
+        const y =
+            (e.clientY - rect.top) /
+            rect.height;
+
+
+        planeta.rotation.x =
+            (y - .5) * .25;
+
+
+        planeta.rotation.z =
+            (x - .5) * .12;
+
+    }
+
+);
+
+
+
+/* =========================
+   RESTABLECER PLANETA
+========================= */
+
+canvas.addEventListener(
+
+    "mouseleave",
+
+    ()=>{
+
+        planeta.rotation.x =
+            0;
+
+        planeta.rotation.z =
+            0;
+
+    }
+
+);
+
+</script>
+
+
+</body>
+
+</html>
+

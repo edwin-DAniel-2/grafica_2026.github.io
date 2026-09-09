@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formación de la Tierra por Gestos — Secuencia 6 etapas</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    overflow:hidden;
+    background:#000;
+    font-family:Arial,sans-serif;
+}
+
+#info{
+    position:fixed;
+    top:25px;
+    left:30px;
+    z-index:20;
+    color:white;
+}
+
+#info h1{
+    font-size:25px;
+    letter-spacing:3px;
+    text-shadow:0 0 15px white;
+}
+
+/* TÍTULO Y BOTÓN */
+#titulo{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.botonInicio{
+    padding:8px 15px;
+    background:#00ffff;
+    color:#000;
+    text-decoration:none;
+    border-radius:8px;
+    font-size:15px;
+    font-weight:bold;
+}
+
+.botonInicio:hover{
+    background:white;
+    box-shadow:0 0 15px #00ffff;
+}
+
+#etapa{
+    margin-top:12px;
+    font-size:20px;
+    color:#00ffff;
+}
+
+#estado{
+    margin-top:8px;
+    font-size:17px;
+    color:#ddd;
+}
+
+#gesto{
+    margin-top:8px;
+    font-size:18px;
+    color:#00ffff;
+}
+
+#camara{
+    position:fixed;
+    right:25px;
+    bottom:25px;
+    width:280px;
+    height:210px;
+    border:2px solid rgba(255,255,255,.6);
+    border-radius:15px;
+    overflow:hidden;
+    z-index:20;
+    background:#111;
+    box-shadow:0 0 25px rgba(0,200,255,.5);
+}
+
+#video{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    transform:scaleX(-1);
+}
+
+#canvas{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+}
+
+#mensaje{
+    position:fixed;
+    bottom:30px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:20;
+    color:white;
+    font-size:17px;
+    text-align:center;
+    padding:12px 25px;
+    border-radius:30px;
+    background:rgba(0,0,0,.6);
+    backdrop-filter:blur(8px);
+}
+
+#progreso{
+    margin-top:12px;
+    width:330px;
+    height:8px;
+    background:rgba(255,255,255,.2);
+    border-radius:10px;
+    overflow:hidden;
+}
+
+#barra{
+    width:0%;
+    height:100%;
+    background:#00ffff;
+    transition:width .08s linear;
+}
+</style>
+</head>
+
+<body>
+
+<div id="info">
+
+    <div id="titulo">
+        <h1>FORMACIÓN DE LA TIERRA</h1>
+
+        <a href="index.html" class="botonInicio">
+            INICIO
+        </a>
+    </div>
+
+    <div id="etapa">ETAPA 1/6 — PLASMA</div>
+
+    <div id="estado">
+        ✋ PALMA — partículas dispersas. Mantén 1 segundo
+    </div>
+
+    <div id="gesto">
+        Gesto: esperando...
+    </div>
+
+    <div id="progreso">
+        <div id="barra"></div>
+    </div>
+
+</div>
+
+<div id="camara">
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas"></canvas>
+</div>
+
+<div id="mensaje">
+    ✋ PALMA → 👍 PULGAR → ✊ PUÑO → ✌️ VICTORIA → 🤏 PINZA → 🌍 TIERRA
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+
+<script type="importmap">
+{
+    "imports":{
+        "three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"
+    }
+}
+</script>
+
+<script type="module">
+
+import * as THREE from
+"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+const cargador = new THREE.TextureLoader();
+const texturaTierra = cargador.load("tierra.jpg");
+const texturaNucleo = cargador.load("nucleo.jpg");
+const texturaCaliente = cargador.load("lava1.jpg");
+
+/* =====================================================
+   ESCENA 3D
+===================================================== */
+
+const escena = new THREE.Scene();
+escena.background = new THREE.Color(0x000005);
+
+const camara3D = new THREE.PerspectiveCamera(
+    60,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    2000
+);
+
+camara3D.position.z = 45;
+
+const renderer = new THREE.WebGLRenderer({
+    antialias:true
+});
+
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+document.body.appendChild(renderer.domElement);
+
+/* =====================================================
+   LUCES
+===================================================== */
+
+const luzAmbiente = new THREE.AmbientLight(0xffffff,1);
+escena.add(luzAmbiente);
+
+const luzPrincipal = new THREE.PointLight(0xffffff,20,150);
+luzPrincipal.position.set(15,10,25);
+escena.add(luzPrincipal);
+const luzObjetos = new THREE.PointLight(0xffffff,12,80);
+luzObjetos.position.set(0,5,20);
+escena.add(luzObjetos);
+
+const luzAzul = new THREE.PointLight(0x0088ff,2.5,100);
+luzAzul.position.set(-20,5,15);
+escena.add(luzAzul);
+
+const luzRoja = new THREE.PointLight(0xff2200,2,100);
+luzRoja.position.set(0,-10,20);
+escena.add(luzRoja);
+
+// Luz del Sol
+const luzSol = new THREE.PointLight(0xfff4c2,0,180);
+luzSol.position.set(-18,12,25);
+escena.add(luzSol);
+
+// Sol visible
+const sol = new THREE.Mesh(
+    new THREE.SphereGeometry(0.55,32,32),
+    new THREE.MeshBasicMaterial({
+        color:0xffffff
+    })
+);
+
+sol.position.copy(luzSol.position);
+escena.add(sol);
+
+const haloSol = new THREE.Mesh(
+    new THREE.SphereGeometry(1.25,32,32),
+    new THREE.MeshBasicMaterial({
+        color:0xffa500,
+        transparent:true,
+        opacity:.35,
+        blending:THREE.AdditiveBlending,
+        depthWrite:false
+    })
+);
+
+haloSol.position.copy(luzSol.position);
+escena.add(haloSol);
+
+sol.visible = false;
+haloSol.visible = false;
+
+/* =====================================================
+   ESTRELLAS
+===================================================== */
+
+const estrellasCantidad = 6000;
+const posicionesEstrellas = new Float32Array(estrellasCantidad * 3);
+
+for(let i=0;i<estrellasCantidad;i++){
+
+    const radio = 500 + Math.random()*700;
+    const theta = Math.random()*Math.PI*2;
+    const phi = Math.acos(2*Math.random()-1);
+
+    posicionesEstrellas[i*3] =
+        radio*Math.sin(phi)*Math.cos(theta);
+
+    posicionesEstrellas[i*3+1] =
+        radio*Math.sin(phi)*Math.sin(theta);
+
+    posicionesEstrellas[i*3+2] =
+        radio*Math.cos(phi);
+}
+
+const geometriaEstrellas = new THREE.BufferGeometry();
+
+geometriaEstrellas.setAttribute(
+    "position",
+    new THREE.BufferAttribute(posicionesEstrellas,3)
+);
+
+const materialEstrellas = new THREE.PointsMaterial({
+    color:0xffffff,
+    size:1.2,
+    transparent:true,
+    opacity:1
+});
+
+const estrellas = new THREE.Points(
+    geometriaEstrellas,
+    materialEstrellas
+);
+
+escena.add(estrellas);
+
+/* =====================================================
+   PARTICULAS
+===================================================== */
+
+const cantidad = 7000;
+
+const posiciones = new Float32Array(cantidad*3);
+const posicionesIniciales = [];
+const velocidades = [];
+
+for(let i=0;i<cantidad;i++){
+
+    const radio = 12 + Math.random()*20;
+    const theta = Math.random()*Math.PI*2;
+    const phi = Math.acos(2*Math.random()-1);
+
+    const x = radio*Math.sin(phi)*Math.cos(theta);
+    const y = radio*Math.sin(phi)*Math.sin(theta);
+    const z = radio*Math.cos(phi);
+
+    posiciones[i*3] = x;
+    posiciones[i*3+1] = y;
+    posiciones[i*3+2] = z;
+
+    posicionesIniciales.push({x,y,z});
+
+    velocidades.push({
+        x:(Math.random()-.5)*.02,
+        y:(Math.random()-.5)*.02,
+        z:(Math.random()-.5)*.02
+    });
+}
+
+const geometriaParticulas = new THREE.BufferGeometry();
+
+geometriaParticulas.setAttribute(
+    "position",
+    new THREE.BufferAttribute(posiciones,3)
+);
+
+const materialParticulas = new THREE.PointsMaterial({
+    color:0xb9c4cc,
+    size:.15,
+    transparent:true,
+    opacity:.9,
+    blending:THREE.AdditiveBlending
+});
+
+const particulas = new THREE.Points(
+    geometriaParticulas,
+    materialParticulas
+);
+
+escena.add(particulas);
+
+/* =====================================================
+   ETAPAS
+===================================================== */
+
+let etapa = 1;
+
+let gestoActual = "";
+let tiempoGesto = 0;
+let gestoEjecutado = false;
+
+const tiempoPalma = 900;
+const tiempoPulgar = 1300;
+const tiempoPuno = 850;
+const tiempoVictoria = 850;
+
+let nucleo = null;
+let luzNucleo = null;
+let tierra = null;
+
+let luzPlanetaCaliente = null;
+let tiempoExplosion = 0;
+let explosionActiva = false;
+let tiempoFormacion = 0;
+let formacionActiva = false;
+let enfriamientoActivo = false;
+let tiempoEnfriamiento = 0;
+
+/* =====================================================
+   HTML
+===================================================== */
+
+const textoEtapa = document.getElementById("etapa");
+const textoEstado = document.getElementById("estado");
+const textoGesto = document.getElementById("gesto");
+const barra = document.getElementById("barra");
+
+function actualizarEtapa(){
+
+    const nombres = [
+        "",
+        "ETAPA 1/6 — PLASMA",
+        "ETAPA 2/6 — ATRACCIÓN",
+        "ETAPA 3/6 — PUÑO / EXPLOSIÓN",
+        "ETAPA 4/6 — VICTORIA / PLANETA CALIENTE",
+        "ETAPA 5/6 — PINZA / ENFRIAMIENTO",
+        "ETAPA 6/6 — TIERRA FRÍA"
+    ];
+
+    textoEtapa.textContent = nombres[etapa];
+}
+
+/* =====================================================
+   NÚCLEO PARA LA EXPLOSIÓN
+===================================================== */
+
+function crearNucleo(){
+
+    if(nucleo) return;
+
+    const geometria = new THREE.SphereGeometry(7,64,64);
+    const material = new THREE.MeshStandardMaterial({
+    map:texturaNucleo,
+    color:0xffffff,
+    emissive:0x000000,
+    emissiveIntensity:0,
+    roughness:.65
+});
+  
+
+    nucleo = new THREE.Mesh(geometria,material);
+    escena.add(nucleo);
+
+    luzNucleo = new THREE.PointLight(0xff2600,24,120);
+    escena.add(luzNucleo);
+}
+
+/* =====================================================
+   TIERRA CALIENTE
+   SOLO COLOR SÓLIDO
+===================================================== */
+
+function crearTierraCaliente(){
+
+    if(tierra) return;
+
+    const geometria = new THREE.SphereGeometry(11,64,64);
+
+    // ESFERA ROJA SÓLIDA
+  const material = new THREE.MeshStandardMaterial({
+
+    map:texturaCaliente,
+
+    color:0xffffff,
+
+    emissive:0x000000,
+    emissiveIntensity:0,
+
+    roughness:.82,
+    metalness:.03
+});
+
+    tierra = new THREE.Mesh(geometria,material);
+
+    tierra.scale.set(.10,.10,.10);
+
+    escena.add(tierra);
+
+    // Luz propia del planeta caliente
+    luzPlanetaCaliente = new THREE.PointLight(
+        0xff3b00,
+        8,
+        45
+    );
+
+    luzPlanetaCaliente.position.set(0,0,5);
+
+    escena.add(luzPlanetaCaliente);
+
+    if(nucleo){
+
+        escena.remove(nucleo);
+
+        nucleo.geometry.dispose();
+        nucleo.material.dispose();
+
+        nucleo = null;
+    }
+
+    if(luzNucleo){
+
+        escena.remove(luzNucleo);
+        luzNucleo = null;
+    }
+}
+
+/* =====================================================
+   CAMBIAR A TIERRA FRÍA
+   MISMA ESFERA — SOLO CAMBIA EL COLOR
+===================================================== */
+
+function convertirATierraFria(){
+
+    if(!tierra) return;
+
+    // MISMA ESFERA
+    // COLOR AZUL SÓLIDO
+    tierra.material.map = texturaTierra;
+    tierra.material.color.set(0xffffff);
+
+    tierra.material.emissive.set(0x000000);
+    tierra.material.emissiveIntensity = 0;
+
+    // Apagar brillo caliente
+    if(luzPlanetaCaliente){
+        luzPlanetaCaliente.intensity = 2;
+    }
+
+    // Encender Sol
+    luzSol.intensity = 40;
+    luzSol.distance = 180;
+
+    sol.visible = true;
+    haloSol.visible = true;
+
+    textoEstado.textContent =
+        "🌍 TIERRA FRÍA — planeta azul. ROTACIÓN...";
+
+    particulas.visible = false;
+
+    etapa = 6;
+
+    enfriamientoActivo = false;
+
+    actualizarEtapa();
+
+    barra.style.width = "100%";
+}
+
+/* =====================================================
+   ETAPA 1 — PALMA
+===================================================== */
+
+function actualizarPlasma(){
+
+    const pos = geometriaParticulas.attributes.position.array;
+
+    for(let i=0;i<cantidad;i++){
+
+        const index=i*3;
+
+        pos[index]   += velocidades[i].x;
+        pos[index+1] += velocidades[i].y;
+        pos[index+2] += velocidades[i].z;
+
+        const distancia = Math.sqrt(
+            pos[index]*pos[index] +
+            pos[index+1]*pos[index+1] +
+            pos[index+2]*pos[index+2]
+        );
+
+        if(distancia>35){
+
+            pos[index]   = posicionesIniciales[i].x;
+            pos[index+1] = posicionesIniciales[i].y;
+            pos[index+2] = posicionesIniciales[i].z;
+        }
+    }
+
+    geometriaParticulas.attributes.position.needsUpdate = true;
+}
+
+/* =====================================================
+   ETAPA 2 — ATRACCIÓN
+===================================================== */
+
+function actualizarAtraccion(){
+
+    const pos = geometriaParticulas.attributes.position.array;
+
+    for(let i=0;i<cantidad;i++){
+
+        const index=i*3;
+
+        let x=pos[index];
+        let y=pos[index+1];
+        let z=pos[index+2];
+
+        const distancia=Math.sqrt(x*x+y*y+z*z);
+
+        const fuerza=.022+(1/Math.max(distancia,1))*.12;
+
+        pos[index]   = x-x*fuerza;
+        pos[index+1] = y-y*fuerza;
+        pos[index+2] = z-z*fuerza;
+    }
+
+    geometriaParticulas.attributes.position.needsUpdate=true;
+}
+
+/* =====================================================
+   ETAPA 3 — EXPLOSIÓN
+===================================================== */
+
+function iniciarExplosion(){
+
+    if(explosionActiva) return;
+
+    explosionActiva=true;
+    tiempoExplosion=0;
+
+    textoEstado.textContent=
+        "💥 ¡PUÑO CONFIRMADO! ¡EXPLOSIÓN!";
+
+    barra.style.width="100%";
+}
+
+function actualizarExplosion(){
+
+    if(!explosionActiva) return;
+
+    const pos=geometriaParticulas.attributes.position.array;
+
+    for(let i=0;i<cantidad;i++){
+
+        const index=i*3;
+
+        let x=pos[index];
+        let y=pos[index+1];
+        let z=pos[index+2];
+
+        const distancia=Math.sqrt(x*x+y*y+z*z);
+
+        const fuerza=.12/Math.max(distancia,.5);
+
+        pos[index]   += x*fuerza;
+        pos[index+1] += y*fuerza;
+        pos[index+2] += z*fuerza;
+    }
+
+    geometriaParticulas.attributes.position.needsUpdate=true;
+
+    if(nucleo){
+
+        const escala=
+            1+Math.sin(tiempoExplosion*30)*.22;
+
+        nucleo.scale.set(
+            escala,
+            escala,
+            escala
+        );
+    }
+
+    tiempoExplosion += .016;
+
+    if(tiempoExplosion>=3){
+
+        explosionActiva=false;
+
+        crearTierraCaliente();
+
+        etapa=4;
+
+        tiempoFormacion=0;
+        formacionActiva=false;
+
+        actualizarEtapa();
+
+        textoEstado.textContent=
+            "✌️ Haz VICTORIA y mantén 0.9 segundos para formar el planeta";
+
+        barra.style.width="0%";
+    }
+}
+
+/* =====================================================
+   ETAPA 4 — VICTORIA CREA EL PLANETA
+===================================================== */
+
+function iniciarFormacion(){
+
+    if(!tierra)
+        crearTierraCaliente();
+
+    formacionActiva=true;
+
+    tiempoFormacion=0;
+
+    particulas.visible=false;
+
+    textoEstado.textContent=
+        "🌋 VICTORIA CONFIRMADA — FORMANDO PLANETA ROJO...";
+}
+
+function actualizarFormacion(){
+
+    if(!formacionActiva || !tierra) return;
+
+    const progreso=Math.min(tiempoFormacion/4,1);
+
+    const escala=.04+(progreso*.96);
+
+    tierra.scale.set(
+        escala,
+        escala,
+        escala
+    );
+
+    tierra.rotation.y += .006;
+    tierra.rotation.x += .0007;
+
+    // Mantiene el planeta rojo caliente
+    //tierra.material.color.set(0xff2200);
+
+    // Brillo fuerte al principio
+    tierra.material.emissiveIntensity =
+        Math.max(
+            0.8,
+            1.8-progreso*1.0
+        );
+
+    tiempoFormacion += .016;
+
+    if(tiempoFormacion>=4){
+
+        tierra.scale.set(1,1,1);
+
+        formacionActiva=false;
+
+        etapa=5;
+
+        tiempoEnfriamiento=0;
+        enfriamientoActivo=false;
+
+        actualizarEtapa();
+
+        textoEstado.textContent=
+            "🤏 Haz PINZA (pulgar + índice) para enfriar la Tierra";
+
+        barra.style.width="0%";
+    }
+}
+
+/* =====================================================
+   ETAPA 5 — PINZA / ENFRIAMIENTO
+   ROJO → AZUL
+===================================================== */
+function actualizarEnfriamiento(){
+
+    if(!tierra || !enfriamientoActivo) return;
+
+    tierra.rotation.y += .008;
+    tierra.rotation.x += .0008;
+
+    tiempoEnfriamiento += .016;
+
+    const progreso =
+        Math.min(tiempoEnfriamiento/3,1);
+
+
+    // =====================================
+    // MANTENER LA IMAGEN DE TIERRA CALIENTE
+    // =====================================
+
+    tierra.material.map = texturaCaliente;
+
+    // Mantener la textura con sus colores originales
+    tierra.material.color.set(0xffffff);
+
+
+    // =====================================
+    // REDUCIR BRILLO CALIENTE
+    // =====================================
+
+    tierra.material.emissiveIntensity =
+        Math.max(
+            0,
+            1.8*(1-progreso)
+        );
+
+
+    // =====================================
+    // REDUCIR LUZ ROJA DEL PLANETA
+    // =====================================
+
+    if(luzPlanetaCaliente){
+
+        luzPlanetaCaliente.intensity =
+            8*(1-progreso);
+    }
+
+
+    // =====================================
+    // AUMENTAR POCO A POCO LA LUZ DEL SOL
+    // =====================================
+
+    luzSol.intensity =
+        5*progreso;
+
+
+    // =====================================
+    // BARRA DE ENFRIAMIENTO
+    // =====================================
+
+    barra.style.width =
+        (progreso*100)+"%";
+
+
+    textoEstado.textContent =
+        "❄️ ENFRIANDO — "+
+        (progreso*100).toFixed(0)+
+        "%";
+
+
+    // =====================================
+    // CUANDO TERMINA EL ENFRIAMIENTO
+    // CAMBIA A tierra.jpg
+    // =====================================
+
+    if(progreso>=1){
+
+        convertirATierraFria();
+    }
+}
+
+/* =====================================================
+   ROTACIÓN TIERRA FRÍA
+===================================================== */
+
+function rotarTierra(){
+
+    if(!tierra) return;
+
+    sol.position.copy(luzSol.position);
+    haloSol.position.copy(luzSol.position);
+
+    tierra.rotation.y += .008;
+    tierra.rotation.x += .0008;
+
+    luzPrincipal.position.x=
+        Math.sin(Date.now()*.0003)*20;
+
+    luzPrincipal.position.z=
+        20+
+        Math.cos(Date.now()*.0003)*10;
+}
+
+/* =====================================================
+   ANIMACIÓN
+===================================================== */
+
+function animar(){
+
+    requestAnimationFrame(animar);
+
+    estrellas.rotation.y += .00005;
+
+    if(etapa===1){
+        actualizarPlasma();
+    }
+
+    if(etapa===2 && gestoActual==="pulgar"){
+        actualizarAtraccion();
+    }
+
+    if(etapa===3){
+        actualizarExplosion();
+    }
+
+    if(etapa===4){
+        actualizarFormacion();
+    }
+
+    if(etapa===5){
+
+        actualizarEnfriamiento();
+
+        if(tierra){
+
+            tierra.rotation.y += .004;
+            tierra.rotation.x += .0004;
+        }
+    }
+
+    if(etapa===6){
+        rotarTierra();
+    }
+
+    renderer.render(
+        escena,
+        camara3D
+    );
+}
+
+animar();
+
+/* =====================================================
+   MEDIAPIPE
+===================================================== */
+
+const video=document.getElementById("video");
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+
+const hands = new Hands({
+
+    locateFile:(file)=>{
+
+        return "https://cdn.jsdelivr.net/npm/@mediapipe/hands/"+file;
+    }
+});
+
+hands.setOptions({
+
+    maxNumHands:1,
+
+    modelComplexity:0,
+
+    selfieMode:false,
+
+    minDetectionConfidence:0.50,
+
+    minTrackingConfidence:0.50
+});
+
+/* =====================================================
+   UTILIDADES DE MANO
+===================================================== */
+
+function distancia3D(a,b){
+
+    return Math.hypot(
+        a.x-b.x,
+        a.y-b.y,
+        (a.z||0)-(b.z||0)
+    );
+}
+
+function dedosAbiertos(p){
+
+    return {
+
+        indice:
+            p[8].y < p[6].y - 0.015,
+
+        medio:
+            p[12].y < p[10].y - 0.015,
+
+        anular:
+            p[16].y < p[14].y - 0.012,
+
+        menique:
+            p[20].y < p[18].y - 0.010
+    };
+}
+
+function dedosCerrados(p){
+
+    return {
+
+        indice:
+            p[8].y >= p[6].y - 0.005,
+
+        medio:
+            p[12].y >= p[10].y - 0.005,
+
+        anular:
+            p[16].y >= p[14].y - 0.005,
+
+        menique:
+            p[20].y >= p[18].y - 0.005
+    };
+}
+
+function esPalma(p,o){
+
+    return o.indice &&
+           o.medio &&
+           o.anular &&
+           o.menique;
+}
+
+function esVictoria(o){
+
+    return o.indice &&
+           o.medio &&
+           !o.anular &&
+           !o.menique;
+}
+
+function esPulgarArriba(p,c){
+
+    const cuatroCerrados =
+        c.indice &&
+        c.medio &&
+        c.anular &&
+        c.menique;
+
+    const vertical =
+        p[4].y < p[3].y - 0.025 &&
+        p[4].y < p[2].y - 0.015;
+
+    const separado =
+        distancia3D(p[4],p[9]) >
+        distancia3D(p[3],p[9])*1.05;
+
+    return cuatroCerrados &&
+           vertical &&
+           separado;
+}
+
+function esPuno(p,c){
+
+    const cuatroCerrados =
+        c.indice &&
+        c.medio &&
+        c.anular &&
+        c.menique;
+
+    const pulgarRecogido =
+        distancia3D(p[4],p[0]) <
+        distancia3D(p[3],p[0])*1.35 ||
+
+        distancia3D(p[4],p[5]) <
+        distancia3D(p[3],p[5])*1.15;
+
+    const noEsPulgarArriba =
+        !(p[4].y < p[3].y - 0.025);
+
+    return cuatroCerrados &&
+           pulgarRecogido &&
+           noEsPulgarArriba;
+}
+
+/* =====================================================
+   DETECCIÓN DE GESTOS POR ETAPA
+===================================================== */
+
+function detectarGesto(puntos){
+
+    const abiertos = dedosAbiertos(puntos);
+    const cerrados = dedosCerrados(puntos);
+
+    let gesto = null;
+
+    if(etapa===1){
+
+        if(esPalma(puntos,abiertos))
+            gesto="palma";
+    }
+
+    else if(etapa===2){
+
+        if(esPulgarArriba(puntos,cerrados))
+            gesto="pulgar";
+    }
+
+    else if(etapa===3){
+
+        if(esPuno(puntos,cerrados))
+            gesto="puño";
+    }
+
+    else if(etapa===4){
+
+        if(esVictoria(abiertos))
+            gesto="victoria";
+    }
+
+    else if(etapa===5){
+
+        const palma=
+            Math.max(
+                distancia3D(puntos[0],puntos[9]),
+                0.001
+            );
+
+        const pinza =
+            distancia3D(puntos[4],puntos[8]) /
+            palma < 0.75 &&
+
+            cerrados.medio &&
+            cerrados.anular &&
+            cerrados.menique;
+
+        if(pinza)
+            gesto="pinza";
+    }
+
+    else if(etapa===6){
+
+        gesto="tierra";
+    }
+
+    if(gesto){
+
+        procesarGesto(gesto);
+
+        const nombres={
+
+            palma:
+                "Gesto: ✋ PALMA",
+
+            pulgar:
+                "Gesto: 👍 PULGAR ARRIBA",
+
+            "puño":
+                "Gesto: ✊ PUÑO",
+
+            victoria:
+                "Gesto: ✌️ VICTORIA",
+
+            pinza:
+                "Gesto: 🤏 PINZA",
+
+            tierra:
+                "Gesto: 🌍 TIERRA"
+        };
+
+        textoGesto.textContent=
+            nombres[gesto];
+    }
+
+    else{
+
+        gestoActual="";
+        tiempoGesto=0;
+        gestoEjecutado=false;
+
+        barra.style.width="0%";
+
+        const espera={
+
+            1:
+                "Gesto: esperando ✋ PALMA...",
+
+            2:
+                "Gesto: esperando 👍 PULGAR...",
+
+            3:
+                "Gesto: esperando ✊ PUÑO...",
+
+            4:
+                "Gesto: esperando ✌️ VICTORIA...",
+
+            5:
+                "Gesto: esperando 🤏 PINZA...",
+
+            6:
+                "Gesto: 🌍 TIERRA"
+        };
+
+        textoGesto.textContent=
+            espera[etapa];
+    }
+}
+
+/* =====================================================
+   PROCESAR GESTO
+===================================================== */
+
+function procesarGesto(gesto){
+
+    if(etapa===6) return;
+
+    if(gestoActual!==gesto){
+
+        gestoActual=gesto;
+
+        tiempoGesto=
+            performance.now();
+
+        gestoEjecutado=false;
+
+        return;
+    }
+
+    const tiempo=
+        performance.now()-
+        tiempoGesto;
+
+    let necesario=1000;
+
+    if(etapa===1)
+        necesario=tiempoPalma;
+
+    if(etapa===2)
+        necesario=tiempoPulgar;
+
+    if(etapa===3)
+        necesario=tiempoPuno;
+
+    if(etapa===4)
+        necesario=tiempoVictoria;
+
+    if(etapa===5)
+        necesario=500;
+
+    const porcentaje=
+        Math.min(
+            tiempo/necesario*100,
+            100
+        );
+
+    barra.style.width=
+        porcentaje+"%";
+
+    /* PALMA */
+
+    if(etapa===1){
+
+        textoEstado.textContent=
+            "✋ PALMA — partículas dispersas. "+
+            (tiempo/1000).toFixed(1)+
+            " / 0.9 s";
+
+        if(
+            tiempo>=tiempoPalma &&
+            !gestoEjecutado
+        ){
+
+            gestoEjecutado=true;
+
+            etapa=2;
+
+            actualizarEtapa();
+
+            textoEstado.textContent=
+                "👍 Mantén PULGAR ARRIBA para atraer las partículas";
+
+            gestoActual="";
+            tiempoGesto=0;
+
+            barra.style.width="0%";
+        }
+
+        return;
+    }
+
+    /* PULGAR */
+
+    if(etapa===2){
+
+        textoEstado.textContent=
+            "🌀 ATRAYENDO — mantén 👍 PULGAR. "+
+            (tiempo/1000).toFixed(1)+
+            " / 1.3 s";
+
+        if(
+            tiempo>=tiempoPulgar &&
+            !gestoEjecutado
+        ){
+
+            gestoEjecutado=true;
+
+            etapa=3;
+
+            crearNucleo();
+
+            explosionActiva=false;
+
+            actualizarEtapa();
+
+            textoEstado.textContent=
+                "✊ Ahora haz PUÑO y mantenlo para provocar la explosión";
+
+            gestoActual="";
+            tiempoGesto=0;
+
+            barra.style.width="0%";
+        }
+
+        return;
+    }
+
+    /* PUÑO */
+
+    if(etapa===3){
+
+        if(explosionActiva)
+            return;
+
+        textoEstado.textContent=
+            "✊ PUÑO — "+
+            (tiempo/1000).toFixed(1)+
+            " / 0.85 s";
+
+        if(
+            tiempo>=tiempoPuno &&
+            !gestoEjecutado
+        ){
+
+            gestoEjecutado=true;
+
+            iniciarExplosion();
+
+            gestoActual="";
+            tiempoGesto=0;
+        }
+
+        return;
+    }
+
+    /* VICTORIA */
+
+    if(etapa===4){
+
+        if(formacionActiva)
+            return;
+
+        textoEstado.textContent=
+            "✌️ VICTORIA — "+
+            (tiempo/1000).toFixed(1)+
+            " / 0.85 s";
+
+        if(
+            tiempo>=tiempoVictoria &&
+            !gestoEjecutado
+        ){
+
+            gestoEjecutado=true;
+
+            iniciarFormacion();
+
+            gestoActual="";
+            tiempoGesto=0;
+
+            barra.style.width="0%";
+        }
+
+        return;
+    }
+
+    /* PINZA */
+
+    if(etapa===5){
+
+        if(!enfriamientoActivo){
+
+            enfriamientoActivo=true;
+
+            textoEstado.textContent=
+                "❄️ PINZA activa — enfriando la Tierra...";
+        }
+
+        return;
+    }
+}
+
+/* =====================================================
+   DIBUJAR MANO
+===================================================== */
+
+function dibujarMano(puntos){
+
+    ctx.fillStyle="#ffffff";
+    ctx.strokeStyle="#00ffff";
+    ctx.lineWidth=2;
+
+    for(const punto of puntos){
+
+        const x=
+            punto.x*canvas.width;
+
+        const y=
+            punto.y*canvas.height;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x,
+            y,
+            4,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+    }
+
+    const conexiones=[
+
+        [0,1],
+        [1,2],
+        [2,3],
+        [3,4],
+
+        [0,5],
+        [5,6],
+        [6,7],
+        [7,8],
+
+        [0,9],
+        [9,10],
+        [10,11],
+        [11,12],
+
+        [0,13],
+        [13,14],
+        [14,15],
+        [15,16],
+
+        [0,17],
+        [17,18],
+        [18,19],
+        [19,20]
+    ];
+
+    for(const conexion of conexiones){
+
+        const a=
+            puntos[conexion[0]];
+
+        const b=
+            puntos[conexion[1]];
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            a.x*canvas.width,
+            a.y*canvas.height
+        );
+
+        ctx.lineTo(
+            b.x*canvas.width,
+            b.y*canvas.height
+        );
+
+        ctx.stroke();
+    }
+}
+
+/* =====================================================
+   RESULTADOS MEDIAPIPE
+===================================================== */
+
+hands.onResults((results)=>{
+
+    if(video.videoWidth>0){
+
+        canvas.width=
+            video.videoWidth;
+
+        canvas.height=
+            video.videoHeight;
+    }
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    if(
+        results.multiHandLandmarks &&
+        results.multiHandLandmarks.length>0
+    ){
+
+        const puntos=
+            results.multiHandLandmarks[0];
+
+        detectarGesto(puntos);
+
+        dibujarMano(puntos);
+
+    }
+
+    else{
+
+        gestoActual="";
+        tiempoGesto=0;
+        gestoEjecutado=false;
+
+        barra.style.width="0%";
+
+        const espera={
+
+            1:
+                "Gesto: esperando ✋ PALMA...",
+
+            2:
+                "Gesto: esperando 👍 PULGAR...",
+
+            3:
+                "Gesto: esperando ✊ PUÑO...",
+
+            4:
+                "Gesto: esperando ✌️ VICTORIA...",
+
+            5:
+                "Gesto: esperando 🤏 PINZA...",
+
+            6:
+                "Gesto: 🌍 TIERRA"
+        };
+
+        textoGesto.textContent=
+            espera[etapa];
+    }
+});
+
+/* =====================================================
+   CÁMARA
+===================================================== */
+
+const camera=new Camera(
+
+    video,
+
+    {
+        onFrame:async()=>{
+
+            await hands.send({
+                image:video
+            });
+        },
+
+        width:640,
+        height:480
+    }
+);
+
+camera.start();
+
+actualizarEtapa();
+
+textoEstado.textContent=
+    "📷 Cámara activa — muestra una mano completa frente a la cámara";
+
+/* =====================================================
+   REDIMENSIONAR
+===================================================== */
+
+window.addEventListener(
+    "resize",
+    ()=>{
+
+        camara3D.aspect=
+            window.innerWidth/
+            window.innerHeight;
+
+        camara3D.updateProjectionMatrix();
+
+        renderer.setSize(
+            window.innerWidth,
+            window.innerHeight
+        );
+    }
+);
+
+</script>
+</body>
+</html>
