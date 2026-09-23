@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Evolución Humana</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            background: #020617;
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        /* =========================
+           CONTENEDOR PRINCIPAL
+        ========================= */
+
+        #contenedor {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* =========================
+           CANVAS 3D
+        ========================= */
+
+        #escena3D {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        /* =========================
+           PARTE SUPERIOR
+        ========================= */
+
+        #cabecera {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 18px 25px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            z-index: 20;
+
+            background: linear-gradient(
+                to bottom,
+                rgba(2, 6, 23, 0.95),
+                rgba(2, 6, 23, 0.45),
+                transparent
+            );
+        }
+
+        #titulo {
+            font-size: 30px;
+            font-weight: bold;
+            color: #67e8f9;
+
+            text-shadow:
+                0 0 10px rgba(34, 211, 238, 0.8),
+                0 0 25px rgba(34, 211, 238, 0.4);
+        }
+
+        /* =========================
+           BOTON INICIO
+        ========================= */
+
+        #btnInicio {
+            text-decoration: none;
+            color: white;
+
+            background: rgba(8, 47, 73, 0.85);
+
+            border: 1px solid #22d3ee;
+
+            padding: 11px 22px;
+
+            border-radius: 10px;
+
+            font-weight: bold;
+
+            transition: 0.3s;
+
+            box-shadow:
+                0 0 10px rgba(34, 211, 238, 0.25);
+        }
+
+        #btnInicio:hover {
+            background: #0891b2;
+
+            box-shadow:
+                0 0 20px rgba(34, 211, 238, 0.7);
+
+            transform: scale(1.05);
+        }
+
+        /* =========================
+           INFORMACIÓN CIENTÍFICA
+        ========================= */
+
+        #nota {
+            position: absolute;
+
+            top: 75px;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            width: min(800px, 90%);
+
+            text-align: center;
+
+            font-size: 13px;
+
+            color: #cbd5e1;
+
+            background: rgba(2, 6, 23, 0.65);
+
+            border: 1px solid rgba(103, 232, 249, 0.2);
+
+            padding: 9px 15px;
+
+            border-radius: 10px;
+
+            backdrop-filter: blur(8px);
+
+            z-index: 15;
+        }
+
+        /* =========================
+           BOTONES DE ETAPAS
+        ========================= */
+
+        #etapas {
+            position: absolute;
+
+            top: 125px;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            width: 95%;
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 8px;
+
+            flex-wrap: wrap;
+
+            z-index: 20;
+        }
+
+        .btnEtapa {
+            background: rgba(15, 23, 42, 0.9);
+
+            color: #cbd5e1;
+
+            border: 1px solid #334155;
+
+            padding: 9px 13px;
+
+            border-radius: 9px;
+
+            cursor: pointer;
+
+            font-size: 13px;
+
+            transition: 0.3s;
+        }
+
+        .btnEtapa:hover {
+            border-color: #22d3ee;
+
+            color: white;
+
+            box-shadow:
+                0 0 12px rgba(34, 211, 238, 0.35);
+        }
+
+        .btnEtapa.activo {
+            background: #0e7490;
+
+            border-color: #67e8f9;
+
+            color: white;
+
+            box-shadow:
+                0 0 18px rgba(34, 211, 238, 0.5);
+        }
+
+        /* =========================
+           PANEL DE INFORMACIÓN
+        ========================= */
+
+        #informacion {
+            position: absolute;
+
+            left: 25px;
+            bottom: 25px;
+
+            width: min(500px, calc(100% - 50px));
+
+            padding: 20px;
+
+            background: rgba(2, 6, 23, 0.88);
+
+            border: 1px solid rgba(34, 211, 238, 0.45);
+
+            border-radius: 15px;
+
+            backdrop-filter: blur(12px);
+
+            z-index: 20;
+
+            box-shadow:
+                0 0 25px rgba(0, 0, 0, 0.45);
+        }
+
+        #numeroEtapa {
+            color: #22d3ee;
+
+            font-size: 13px;
+
+            font-weight: bold;
+
+            margin-bottom: 5px;
+        }
+
+        #nombreEtapa {
+            font-size: 27px;
+
+            color: white;
+
+            margin-bottom: 10px;
+
+            text-shadow:
+                0 0 12px rgba(34, 211, 238, 0.5);
+        }
+
+        #descripcion {
+            color: #cbd5e1;
+
+            line-height: 1.6;
+
+            font-size: 15px;
+        }
+
+        #siguiente {
+            margin-top: 13px;
+
+            padding-top: 12px;
+
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+
+            color: #67e8f9;
+
+            font-weight: bold;
+
+            font-size: 14px;
+        }
+
+        /* =========================
+           CONTROLES
+        ========================= */
+
+        #controles {
+            position: absolute;
+
+            right: 25px;
+            bottom: 25px;
+
+            width: 230px;
+
+            background: rgba(2, 6, 23, 0.82);
+
+            border: 1px solid rgba(34, 211, 238, 0.35);
+
+            padding: 16px;
+
+            border-radius: 13px;
+
+            z-index: 20;
+
+            backdrop-filter: blur(10px);
+        }
+
+        #controles h3 {
+            color: #67e8f9;
+
+            margin-bottom: 10px;
+
+            font-size: 16px;
+        }
+
+        #controles p {
+            color: #cbd5e1;
+
+            font-size: 13px;
+
+            line-height: 1.7;
+        }
+
+        /* =========================
+           CARGANDO
+        ========================= */
+
+        #cargando {
+            position: absolute;
+
+            inset: 0;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            flex-direction: column;
+
+            background: rgba(2, 6, 23, 0.88);
+
+            z-index: 100;
+        }
+
+        #cargando h2 {
+            color: #67e8f9;
+
+            margin-bottom: 10px;
+        }
+
+        #barraCarga {
+            width: 220px;
+
+            height: 5px;
+
+            background: #1e293b;
+
+            border-radius: 10px;
+
+            overflow: hidden;
+        }
+
+        #barraCargaInterna {
+            width: 0%;
+
+            height: 100%;
+
+            background: #22d3ee;
+
+            transition: width 0.3s;
+        }
+
+        /* =========================
+           ERROR
+        ========================= */
+
+        #error {
+
+            display: none;
+
+            position: absolute;
+
+            left: 50%;
+
+            top: 45%;
+
+            transform: translate(
+                -50%,
+                -50%
+            );
+
+            width: 500px;
+
+            padding: 20px;
+
+            background: rgba(
+                80,
+                0,
+                0,
+                0.92
+            );
+
+            border: 1px solid red;
+
+            border-radius: 15px;
+
+            text-align: center;
+
+            z-index: 50;
+
+        }
+
+
+        #error h2 {
+
+            color: #ff4444;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        #error p {
+
+            line-height: 1.5;
+
+        }
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media(max-width: 800px) {
+
+            #titulo {
+                font-size: 21px;
+            }
+
+            #cabecera {
+                padding: 14px;
+            }
+
+            #btnInicio {
+                padding: 8px 13px;
+
+                font-size: 12px;
+            }
+
+            #nota {
+                top: 65px;
+
+                font-size: 11px;
+            }
+
+            #etapas {
+                top: 105px;
+            }
+
+            .btnEtapa {
+                font-size: 10px;
+
+                padding: 7px 8px;
+            }
+
+            #informacion {
+                left: 12px;
+                bottom: 12px;
+
+                width: calc(100% - 24px);
+
+                padding: 14px;
+            }
+
+            #nombreEtapa {
+                font-size: 21px;
+            }
+
+            #descripcion {
+                font-size: 13px;
+            }
+
+            #controles {
+                display: none;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div id="contenedor">
+
+    <!-- ESCENA 3D -->
+    <div id="escena3D"></div>
+
+
+    <!-- CABECERA -->
+
+    <header id="cabecera">
+
+        <div id="titulo">
+            EVOLUCIÓN HUMANA
+        </div>
+
+        <a href="index.html" id="btnInicio">
+            INICIO
+        </a>
+
+    </header>
+
+
+    <!-- NOTA CIENTÍFICA -->
+
+    <div id="nota">
+
+        La evolución humana fue un proceso ramificado y no una línea
+        completamente recta. Aquí se muestran algunos de sus principales
+        grupos y etapas para conocer nuestra historia.
+
+    </div>
+
+
+    <!-- BOTONES -->
+
+    <div id="etapas">
+
+        <button class="btnEtapa activo" data-etapa="0">
+            Australopithecus
+        </button>
+
+        <button class="btnEtapa" data-etapa="1">
+            Homo habilis
+        </button>
+
+        <button class="btnEtapa" data-etapa="2">
+            Homo erectus
+        </button>
+
+        <button class="btnEtapa" data-etapa="3">
+            Neandertal
+        </button>
+
+        <button class="btnEtapa" data-etapa="4">
+            Homo sapiens
+        </button>
+
+        <button class="btnEtapa" data-etapa="5">
+            Humano actual
+        </button>
+
+    </div>
+
+
+    <!-- INFORMACIÓN -->
+
+    <div id="informacion">
+
+        <div id="numeroEtapa">
+            ETAPA 1 / 6
+        </div>
+
+        <div id="nombreEtapa">
+            Australopithecus
+        </div>
+
+        <div id="descripcion">
+            Los australopitecos fueron antiguos homininos que vivieron
+            en África hace millones de años. Caminaban sobre dos piernas,
+            aunque todavía conservaban características que les permitían
+            desplazarse por los árboles.
+        </div>
+
+        <div id="siguiente">
+            
+        </div>
+
+    </div>
+
+
+    <!-- CONTROLES -->
+
+    <div id="controles">
+
+        <h3> Controles 3D</h3>
+
+        <p>
+            Clic izquierdo + arrastrar<br>
+            → Girar el modelo
+        </p>
+
+        <p>
+             Rueda del mouse<br>
+            → Acercar / alejar
+        </p>
+
+        <p>
+            Haz clic en una etapa<br>
+            → Cambiar de modelo
+        </p>
+
+    </div>
+
+
+    <!-- CARGANDO -->
+
+    <div id="cargando">
+
+        <h2> Cargando modelo...</h2>
+
+        <div id="barraCarga">
+            <div id="barraCargaInterna"></div>
+        </div>
+
+    </div>
+
+
+    <!-- ERROR -->
+
+    <div id="error">
+
+        <h2> No se pudo cargar el modelo</h2>
+
+        <p id="mensajeError">
+            Revisa que el archivo .glb esté en la carpeta correcta.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     THREE.JS
+========================= -->
+
+<script type="importmap">
+
+{
+    "imports": {
+
+        "three":
+        "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+
+        "three/addons/":
+        "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+
+    }
+}
+
+</script>
+
+
+<script type="module">
+
+import * as THREE from "three";
+
+import { OrbitControls }
+from "three/addons/controls/OrbitControls.js";
+
+import { GLTFLoader }
+from "three/addons/loaders/GLTFLoader.js";
+
+
+
+/* =====================================================
+   ESCENA
+===================================================== */
+
+const escena = new THREE.Scene();
+
+escena.background = new THREE.Color(0x020617);
+
+
+
+/* =====================================================
+   CÁMARA
+===================================================== */
+
+const camara = new THREE.PerspectiveCamera(
+
+    45,
+
+    window.innerWidth / window.innerHeight,
+
+    0.1,
+
+    2000
+
+);
+
+camara.position.set(
+    0,
+    2,
+    8
+);
+
+
+
+/* =====================================================
+   RENDERER
+===================================================== */
+
+const renderer = new THREE.WebGLRenderer({
+
+    antialias: true,
+
+    alpha: false
+
+});
+
+renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio, 2)
+);
+
+renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+);
+
+renderer.shadowMap.enabled = true;
+
+renderer.shadowMap.type =
+    THREE.PCFSoftShadowMap;
+
+renderer.outputColorSpace =
+    THREE.SRGBColorSpace;
+
+document
+    .getElementById("escena3D")
+    .appendChild(renderer.domElement);
+
+
+
+/* =====================================================
+   CONTROLES DEL MOUSE
+===================================================== */
+
+const controles = new OrbitControls(
+
+    camara,
+
+    renderer.domElement
+
+);
+
+controles.enableRotate = true;
+
+controles.enableZoom = true;
+
+controles.enablePan = false;
+
+controles.enableDamping = true;
+
+controles.dampingFactor = 0.06;
+
+controles.minDistance = 1.5;
+
+controles.maxDistance = 20;
+
+
+
+/* =====================================================
+   LUCES
+===================================================== */
+
+const luzAmbiente =
+    new THREE.HemisphereLight(
+
+        0x9be7ff,
+
+        0x080820,
+
+        2.5
+
+    );
+
+escena.add(luzAmbiente);
+
+
+
+const luzPrincipal =
+    new THREE.DirectionalLight(
+
+        0xffffff,
+
+        4
+
+    );
+
+luzPrincipal.position.set(
+    5,
+    10,
+    7
+);
+
+luzPrincipal.castShadow = true;
+
+escena.add(luzPrincipal);
+
+
+
+const luzAzul =
+    new THREE.PointLight(
+
+        0x22d3ee,
+
+        15,
+
+        30
+
+    );
+
+luzAzul.position.set(
+    -5,
+    3,
+    4
+);
+
+escena.add(luzAzul);
+
+
+
+/* =====================================================
+   SUELO
+===================================================== */
+
+const geometriaSuelo =
+    new THREE.CircleGeometry(
+        5,
+        64
+    );
+
+const materialSuelo =
+    new THREE.MeshStandardMaterial({
+
+        color: 0x020617,
+
+        transparent: true,
+
+        opacity: 0.8,
+
+        roughness: 0.9,
+
+        metalness: 0.1
+
+    });
+
+const suelo =
+    new THREE.Mesh(
+
+        geometriaSuelo,
+
+        materialSuelo
+
+    );
+
+suelo.rotation.x = -Math.PI / 2;
+
+suelo.position.y = -0.01;
+
+suelo.receiveShadow = true;
+
+escena.add(suelo);
+
+
+
+/* =====================================================
+   ANILLO DE LUZ
+===================================================== */
+
+const geometriaAnillo =
+    new THREE.RingGeometry(
+
+        1.5,
+        1.57,
+        64
+
+    );
+
+const materialAnillo =
+    new THREE.MeshBasicMaterial({
+
+        color: 0x22d3ee,
+
+        transparent: true,
+
+        opacity: 0.6,
+
+        side: THREE.DoubleSide
+
+    });
+
+const anillo =
+    new THREE.Mesh(
+
+        geometriaAnillo,
+
+        materialAnillo
+
+    );
+
+anillo.rotation.x = -Math.PI / 2;
+
+anillo.position.y = 0.01;
+
+escena.add(anillo);
+
+
+
+/* =====================================================
+   ESTRELLAS
+===================================================== */
+
+const cantidadEstrellas = 2500;
+
+const posicionesEstrellas =
+    new Float32Array(
+        cantidadEstrellas * 3
+    );
+
+for (
+    let i = 0;
+    i < cantidadEstrellas;
+    i++
+) {
+
+    posicionesEstrellas[i * 3] =
+        (Math.random() - 0.5) * 400;
+
+    posicionesEstrellas[i * 3 + 1] =
+        (Math.random() - 0.5) * 250;
+
+    posicionesEstrellas[i * 3 + 2] =
+        (Math.random() - 0.5) * 400;
+
+}
+
+const geometriaEstrellas =
+    new THREE.BufferGeometry();
+
+geometriaEstrellas.setAttribute(
+
+    "position",
+
+    new THREE.BufferAttribute(
+        posicionesEstrellas,
+        3
+    )
+
+);
+
+const materialEstrellas =
+    new THREE.PointsMaterial({
+
+        color: 0xffffff,
+
+        size: 0.7,
+
+        transparent: true,
+
+        opacity: 0.8
+
+    });
+
+const estrellas =
+    new THREE.Points(
+
+        geometriaEstrellas,
+
+        materialEstrellas
+
+    );
+
+escena.add(estrellas);
+
+
+
+/* =====================================================
+   DATOS DE LAS ETAPAS
+===================================================== */
+
+const etapas = [
+
+    {
+
+        nombre:
+        "Australopithecus",
+
+        archivo:
+        "modelos/evolucion/australopithecus.glb",
+
+        descripcion:
+
+        "Los australopitecos fueron antiguos homininos que vivieron en África hace millones de años. Caminaban sobre dos piernas, aunque todavía conservaban características que les permitían desplazarse por los árboles.",
+
+        siguiente:
+        '👉 Pulsa "Homo habilis" para continuar.'
+
+    },
+
+
+    {
+
+        nombre:
+        "Homo habilis",
+
+        archivo:
+        "modelos/evolucion/homo_habilis.glb",
+
+        descripcion:
+
+        "Homo habilis vivió en África hace aproximadamente entre 2,4 y 1,4 millones de años. Se encuentra asociado con algunas de las primeras herramientas de piedra conocidas dentro de nuestro linaje.",
+
+        siguiente:
+        '👉 Pulsa "Homo erectus" para continuar.'
+
+    },
+
+
+    {
+
+        nombre:
+        "Homo erectus",
+
+        archivo:
+        "modelos/evolucion/homo_erectus.glb",
+
+        descripcion:
+
+        "Homo erectus vivió durante un periodo muy extenso y fue uno de los primeros humanos antiguos en expandirse fuera de África. Su cuerpo presentaba proporciones más parecidas a las de los humanos actuales.",
+
+        siguiente:
+        '👉 Pulsa "Neandertal" para continuar.'
+
+    },
+
+
+    {
+
+        nombre:
+        "Neandertal",
+
+        archivo:
+        "modelos/evolucion/neandertal.glb",
+
+        descripcion:
+
+        "Los neandertales vivieron principalmente en Europa y partes de Asia occidental. Fabricaban herramientas, utilizaban el fuego y desarrollaron comportamientos sociales complejos. Compartieron el planeta con los primeros Homo sapiens.",
+
+        siguiente:
+        '👉 Pulsa "Homo sapiens" para continuar.'
+
+    },
+
+
+    {
+
+        nombre:
+        "Homo sapiens",
+
+        archivo:
+        "modelos/evolucion/homo_sapiens.glb",
+
+        descripcion:
+
+        "Homo sapiens apareció en África hace cientos de miles de años. Nuestra especie desarrolló una gran capacidad para comunicarse, crear herramientas, transmitir conocimientos y adaptarse a diferentes ambientes.",
+
+        siguiente:
+        '👉 Pulsa "Humano actual" para conocer al ser humano de hoy.'
+
+    },
+
+
+    {
+
+        nombre:
+        "Humano actual",
+
+        archivo:
+        "modelos/evolucion/humano_actual.glb",
+
+        descripcion:
+
+        "El ser humano actual pertenece a la especie Homo sapiens. Hoy vivimos en sociedades muy diversas y utilizamos herramientas, ciencia y tecnología para transformar nuestro entorno. Nuestra evolución continúa siendo estudiada mediante fósiles, genética y otras evidencias científicas.",
+
+        siguiente:
+        "🎉 Has llegado al ser humano actual. ¡Has recorrido las principales etapas de esta experiencia!"
+
+    }
+
+];
+
+
+
+/* =====================================================
+   VARIABLES DEL MODELO
+===================================================== */
+
+const loader =
+    new GLTFLoader();
+
+let modeloActual = null;
+
+let mezclador = null;
+
+let accionAnimacion = null;
+
+let reloj =
+    new THREE.Clock();
+
+
+
+/* =====================================================
+   ELEMENTOS HTML
+===================================================== */
+
+const botones =
+    document.querySelectorAll(
+        ".btnEtapa"
+    );
+
+const numeroEtapa =
+    document.getElementById(
+        "numeroEtapa"
+    );
+
+const nombreEtapa =
+    document.getElementById(
+        "nombreEtapa"
+    );
+
+const descripcion =
+    document.getElementById(
+        "descripcion"
+    );
+
+const siguiente =
+    document.getElementById(
+        "siguiente"
+    );
+
+const cargando =
+    document.getElementById(
+        "cargando"
+    );
+
+const barraCarga =
+    document.getElementById(
+        "barraCargaInterna"
+    );
+
+const error =
+    document.getElementById(
+        "error"
+    );
+
+const mensajeError =
+    document.getElementById(
+        "mensajeError"
+    );
+
+
+
+/* =====================================================
+   CARGAR ETAPA
+===================================================== */
+
+function cargarEtapa(indice) {
+
+    const etapa =
+        etapas[indice];
+
+
+    /* -------------------------
+       INFORMACIÓN
+    ------------------------- */
+
+    numeroEtapa.textContent =
+        `ETAPA ${indice + 1} / ${etapas.length}`;
+
+    nombreEtapa.textContent =
+        etapa.nombre;
+
+    descripcion.textContent =
+        etapa.descripcion;
+
+    siguiente.textContent =
+        etapa.siguiente;
+
+
+    /* -------------------------
+       BOTONES
+    ------------------------- */
+
+    botones.forEach(
+        (boton, i) => {
+
+            boton.classList.toggle(
+
+                "activo",
+
+                i === indice
+
+            );
+
+        }
+    );
+
+
+    /* -------------------------
+       DETENER ANTERIOR
+    ------------------------- */
+
+    if (mezclador) {
+
+        mezclador.stopAllAction();
+
+        mezclador = null;
+
+    }
+
+
+    if (modeloActual) {
+
+        escena.remove(
+            modeloActual
+        );
+
+        modeloActual = null;
+
+    }
+
+
+    /* -------------------------
+       MOSTRAR CARGANDO
+    ------------------------- */
+
+    error.style.display =
+        "none";
+
+    cargando.style.display =
+        "flex";
+
+    barraCarga.style.width =
+        "0%";
+
+
+    /* -------------------------
+       CARGAR GLB
+    ------------------------- */
+
+    loader.load(
+
+        etapa.archivo,
+
+        function(gltf) {
+
+            modeloActual =
+                gltf.scene;
+
+
+            /* ---------------------
+               SOMBRAS
+            --------------------- */
+
+            modeloActual.traverse(
+
+                function(objeto) {
+
+                    if (
+                        objeto.isMesh
+                    ) {
+
+                        objeto.castShadow =
+                            true;
+
+                        objeto.receiveShadow =
+                            true;
+
+                    }
+
+                }
+
+            );
+
+
+            /* ---------------------
+               CENTRAR Y ESCALAR
+            --------------------- */
+
+            prepararModelo(
+                modeloActual
+            );
+
+
+            escena.add(
+                modeloActual
+            );
+
+
+            /* ---------------------
+               ANIMACIÓN
+            --------------------- */
+
+            if (
+                gltf.animations &&
+                gltf.animations.length > 0
+            ) {
+
+                mezclador =
+                    new THREE.AnimationMixer(
+                        modeloActual
+                    );
+
+
+                let animacionCaminar =
+                    null;
+
+
+                for (
+                    const animacion
+                    of gltf.animations
+                ) {
+
+                    const nombre =
+                        animacion.name
+                            .toLowerCase();
+
+
+                    if (
+
+                        nombre.includes(
+                            "walk"
+                        )
+
+                        ||
+
+                        nombre.includes(
+                            "walking"
+                        )
+
+                        ||
+
+                        nombre.includes(
+                            "caminar"
+                        )
+
+                        ||
+
+                        nombre.includes(
+                            "run"
+                        )
+
+                    ) {
+
+                        animacionCaminar =
+                            animacion;
+
+                        break;
+
+                    }
+
+                }
+
+
+                /* Si no encuentra caminar,
+                   usa la primera animación */
+
+                if (
+                    !animacionCaminar
+                ) {
+
+                    animacionCaminar =
+                        gltf.animations[0];
+
+                }
+
+
+                accionAnimacion =
+                    mezclador.clipAction(
+                        animacionCaminar
+                    );
+
+
+                accionAnimacion
+                    .reset()
+                    .fadeIn(0.3)
+                    .play();
+
+            }
+
+
+            /* ---------------------
+               TERMINAR CARGA
+            --------------------- */
+
+            barraCarga.style.width =
+                "100%";
+
+
+            setTimeout(
+                () => {
+
+                    cargando.style.display =
+                        "none";
+
+                },
+                250
+            );
+
+        },
+
+
+
+        /* -------------------------
+           PROGRESO
+        ------------------------- */
+
+        function(xhr) {
+
+            if (
+                xhr.total > 0
+            ) {
+
+                const porcentaje =
+                    (
+                        xhr.loaded /
+                        xhr.total
+                    ) * 100;
+
+                barraCarga.style.width =
+                    porcentaje + "%";
+
+            }
+
+        },
+
+
+
+        /* -------------------------
+           ERROR
+        ------------------------- */
+
+        function(err) {
+
+            console.error(
+                "Error cargando modelo:",
+                err
+            );
+
+            cargando.style.display =
+                "none";
+
+            error.style.display =
+                "block";
+
+            mensajeError.innerHTML =
+
+                `No se pudo cargar:<br><br>
+                <strong>${etapa.archivo}</strong>
+                <br><br>
+                Revisa que el archivo exista y que
+                el nombre coincida exactamente.`;
+
+        }
+
+    );
+
+}
+
+
+
+/* =====================================================
+   PREPARAR MODELO
+===================================================== */
+
+function prepararModelo(modelo) {
+
+    /* Obtener tamaño */
+
+    const caja =
+        new THREE.Box3()
+            .setFromObject(modelo);
+
+
+    const centro =
+        caja.getCenter(
+            new THREE.Vector3()
+        );
+
+
+    const tamaño =
+        caja.getSize(
+            new THREE.Vector3()
+        );
+
+
+    /* Centrar horizontalmente */
+
+    modelo.position.x -=
+        centro.x;
+
+    modelo.position.z -=
+        centro.z;
+
+
+    /* Colocar pies sobre el suelo */
+
+    modelo.position.y -=
+        caja.min.y;
+
+
+    /* -------------------------
+       ESCALA AUTOMÁTICA
+    ------------------------- */
+
+    const altura =
+        tamaño.y;
+
+
+    if (altura > 0) {
+
+        const escalaDeseada =
+            4.5;
+
+        const escala =
+            escalaDeseada /
+            altura;
+
+        modelo.scale.setScalar(
+            escala
+        );
+
+    }
+
+
+    /* -------------------------
+       NUEVO CENTRADO
+    ------------------------- */
+
+    const cajaNueva =
+        new THREE.Box3()
+            .setFromObject(modelo);
+
+
+    const centroNuevo =
+        cajaNueva.getCenter(
+            new THREE.Vector3()
+        );
+
+
+    modelo.position.x -=
+        centroNuevo.x;
+
+    modelo.position.z -=
+        centroNuevo.z;
+
+
+    /* Pies nuevamente sobre suelo */
+
+    modelo.position.y -=
+        cajaNueva.min.y;
+
+
+    /* -------------------------
+       CÁMARA
+    ------------------------- */
+
+    const alturaFinal =
+        cajaNueva.getSize(
+            new THREE.Vector3()
+        ).y;
+
+
+    const distancia =
+        Math.max(
+            6,
+            alturaFinal * 1.6
+        );
+
+
+    camara.position.set(
+
+        distancia * 0.65,
+
+        alturaFinal * 0.55,
+
+        distancia
+
+    );
+
+
+    controles.target.set(
+
+        0,
+
+        alturaFinal * 0.48,
+
+        0
+
+    );
+
+
+    controles.update();
+
+}
+
+
+
+/* =====================================================
+   BOTONES DE ETAPAS
+===================================================== */
+
+botones.forEach(
+
+    function(boton) {
+
+        boton.addEventListener(
+            "click",
+
+            function() {
+
+                const indice =
+                    Number(
+                        boton.dataset.etapa
+                    );
+
+                cargarEtapa(
+                    indice
+                );
+
+            }
+        );
+
+    }
+
+);
+
+
+
+/* =====================================================
+   ANIMACIÓN
+===================================================== */
+
+function animar() {
+
+    requestAnimationFrame(
+        animar
+    );
+
+
+    const delta =
+        reloj.getDelta();
+
+
+    /* Actualizar animación */
+
+    if (mezclador) {
+
+        mezclador.update(
+            delta
+        );
+
+    }
+
+
+    /* Movimiento suave de estrellas */
+
+    estrellas.rotation.y +=
+        delta * 0.01;
+
+
+    /* Anillo */
+
+    anillo.rotation.z +=
+        delta * 0.3;
+
+
+    /* Controles */
+
+    controles.update();
+
+
+    /* Render */
+
+    renderer.render(
+        escena,
+        camara
+    );
+
+}
+
+
+
+/* =====================================================
+   CAMBIO DE TAMAÑO
+===================================================== */
+
+window.addEventListener(
+
+    "resize",
+
+    function() {
+
+        camara.aspect =
+            window.innerWidth /
+            window.innerHeight;
+
+        camara.updateProjectionMatrix();
+
+
+        renderer.setSize(
+
+            window.innerWidth,
+
+            window.innerHeight
+
+        );
+
+    }
+
+);
+
+
+
+/* =====================================================
+   INICIAR
+===================================================== */
+
+cargarEtapa(0);
+
+animar();
+
+</script>
+
+</body>
+
+</html>
